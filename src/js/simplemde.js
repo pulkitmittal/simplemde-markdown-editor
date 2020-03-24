@@ -630,7 +630,7 @@ function drawLink(editor) {
 /**
  * Action for drawing an img.
  */
-function drawImage(editor) {
+function drawImage(editor, link) {
 	var cm = editor.codemirror;
 	var stat = getState(cm);
 	var options = editor.options;
@@ -640,6 +640,8 @@ function drawImage(editor) {
 		if(!url) {
 			return false;
 		}
+	} else if(link) {
+		url = link;
 	}
 	_replaceSelection(cm, stat.image, options.insertTexts.image, url);
 }
@@ -1532,7 +1534,7 @@ function isLocalStorageAvailable() {
 		try {
 			localStorage.setItem("smde_localStorage", 1);
 			localStorage.removeItem("smde_localStorage");
-		} catch(e) {
+		} catch (e) {
 			return false;
 		}
 	} else {
@@ -1947,8 +1949,8 @@ SimpleMDE.prototype.cleanBlock = function() {
 SimpleMDE.prototype.drawLink = function() {
 	drawLink(this);
 };
-SimpleMDE.prototype.drawImage = function() {
-	drawImage(this);
+SimpleMDE.prototype.drawImage = function(link) {
+	drawImage(this, link);
 };
 SimpleMDE.prototype.drawTable = function() {
 	drawTable(this);
