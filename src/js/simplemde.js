@@ -613,16 +613,18 @@ function cleanBlock(editor) {
 /**
  * Action for drawing a link.
  */
-function drawLink(editor) {
+function drawLink(editor, link) {
 	var cm = editor.codemirror;
 	var stat = getState(cm);
 	var options = editor.options;
 	var url = "http://";
-	if(options.promptURLs) {
+	if(link) {
+		url = link;
+	} else if(options.promptURLs) {
 		url = prompt(options.promptTexts.link);
-		if(!url) {
-			return false;
-		}
+	}
+	if(!url) {
+		return false;
 	}
 	_replaceSelection(cm, stat.link, options.insertTexts.link, url);
 }
@@ -635,13 +637,13 @@ function drawImage(editor, link) {
 	var stat = getState(cm);
 	var options = editor.options;
 	var url = "http://";
-	if(options.promptURLs) {
-		url = prompt(options.promptTexts.image);
-		if(!url) {
-			return false;
-		}
-	} else if(link) {
+	if(link) {
 		url = link;
+	} else if(options.promptURLs) {
+		url = prompt(options.promptTexts.image);
+	}
+	if(!url) {
+		return false;
 	}
 	_replaceSelection(cm, stat.image, options.insertTexts.image, url);
 }
@@ -800,6 +802,7 @@ function _replaceSelection(cm, active, startEnd, url) {
 	var startPoint = cm.getCursor("start");
 	var endPoint = cm.getCursor("end");
 	if(url) {
+		start = start.replace("#url#", url);
 		end = end.replace("#url#", url);
 	}
 	if(active) {
@@ -1356,7 +1359,7 @@ function SimpleMDE(options) {
 
 
 	// Merging the promptTexts, with the given options
-	options.promptTexts = promptTexts;
+	options.promptTexts = extend({}, promptTexts, options.promptTexts || {});
 
 
 	// Merging the blockStyles, with the given options
@@ -1946,8 +1949,8 @@ SimpleMDE.prototype.toggleOrderedList = function() {
 SimpleMDE.prototype.cleanBlock = function() {
 	cleanBlock(this);
 };
-SimpleMDE.prototype.drawLink = function() {
-	drawLink(this);
+SimpleMDE.prototype.drawLink = function(link) {
+	drawLink(this, link);
 };
 SimpleMDE.prototype.drawImage = function(link) {
 	drawImage(this, link);
